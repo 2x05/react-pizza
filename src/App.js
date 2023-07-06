@@ -4,19 +4,9 @@ import Header from './components/Header/Header';
 import Sort from './components/Sort/Sort';
 import Categories from './components/Categories/Categories';
 import PizzaBlock from './components/PizzaBlock/PizzaBlock';
+import Pizzas from './assets/pizzas';
 
 import './scss/app.scss';
-
-const items = [
-  { title: 'Мексиканская', price: '2234' },
-  { title: 'Веганская', price: '5643' },
-  { title: 'Угандская', price: '9566' },
-  { title: 'Итальянская', price: '1234' },
-  { title: '4 сыра', price: '2345' },
-  { title: 'Неополитана', price: '5632' },
-  { title: 'С салом', price: '6674' },
-  { title: 'С брынзой', price: '7375' },
-];
 
 function App() {
   return (
@@ -30,8 +20,8 @@ function App() {
           </div>
           <h2 className="content__title">Все пиццы</h2>
           <div className="content__items">
-            {items.map(({ title, price }) => (
-              <PizzaBlock title={title} price={price} />
+            {Pizzas.map((obj) => (
+              <PizzaBlock key={obj.id} {...obj} />
             ))}
           </div>
         </div>
