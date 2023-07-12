@@ -31,8 +31,11 @@ const Home = () => {
         return res.json();
       })
       .then(({ data, pagecount }) => {
-        setpageCount(pagecount);
+        if (currentPage > pagecount) {
+          setCurrentPage(1);
+        }
         setItem(data);
+        setpageCount(pagecount);
         setIsLoading(false);
       });
     window.scrollTo(0, 0);
