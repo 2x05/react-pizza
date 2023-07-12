@@ -48,7 +48,7 @@ const Home = () => {
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">{isLoadind ? skeleton : pizzas}</div>
-      {item.length > 0 && (
+      {pageCount > 0 && (
         <Pagination
           onCangePage={(number) => setCurrentPage(number)}
           currentPage={currentPage}
