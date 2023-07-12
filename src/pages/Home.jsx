@@ -31,9 +31,7 @@ const Home = () => {
         return res.json();
       })
       .then(({ data, pagecount }) => {
-        if (currentPage > pagecount) {
-          setCurrentPage(1);
-        }
+        currentPage > pagecount && setCurrentPage(1);
         setItem(data);
         setpageCount(pagecount);
         setIsLoading(false);
@@ -50,11 +48,13 @@ const Home = () => {
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">{isLoadind ? skeleton : pizzas}</div>
-      <Pagination
-        onCangePage={(number) => setCurrentPage(number)}
-        currentPage={currentPage}
-        pageCount={pageCount}
-      />
+      {item.length > 0 && (
+        <Pagination
+          onCangePage={(number) => setCurrentPage(number)}
+          currentPage={currentPage}
+          pageCount={pageCount}
+        />
+      )}
     </div>
   );
 };
