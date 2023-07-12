@@ -1,7 +1,6 @@
 import React from 'react';
 
-function Categories() {
-  const [activeIndex, setActiveIndex] = React.useState(0);
+function Categories({ activeIndex, setActiveIndex }) {
   const categories = [
     { name: 'Все' },
     { name: 'Мясные' },

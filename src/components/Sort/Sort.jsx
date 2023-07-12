@@ -1,9 +1,8 @@
 import React from 'react';
 
-function Sort() {
+function Sort({ activeSort, setActiveSort }) {
   const [open, setOpen] = React.useState(false);
   const sortTags = ['популярности', 'цене', 'алфавиту'];
-  const [activeSort, setActiveSort] = React.useState(0);
 
   const selectClose = (index) => {
     setActiveSort(index);
