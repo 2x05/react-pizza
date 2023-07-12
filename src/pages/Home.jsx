@@ -14,6 +14,7 @@ const Home = () => {
   const [categoryId, setCategoryId] = React.useState(0);
   const [sortType, setSortType] = React.useState(0);
   const [currentPage, setCurrentPage] = React.useState(1);
+  const [pageCount, setpageCount] = React.useState(1);
 
   React.useEffect(() => {
     setIsLoading(true);
@@ -29,8 +30,9 @@ const Home = () => {
       .then((res) => {
         return res.json();
       })
-      .then((arr) => {
-        setItem(arr);
+      .then(({ data, pagecount }) => {
+        setpageCount(pagecount);
+        setItem(data);
         setIsLoading(false);
       });
     window.scrollTo(0, 0);
@@ -45,7 +47,11 @@ const Home = () => {
       </div>
       <h2 className="content__title">Все пиццы</h2>
       <div className="content__items">{isLoadind ? skeleton : pizzas}</div>
-      <Pagination onCangePage={(number) => setCurrentPage(number)} currentPage={currentPage} />
+      <Pagination
+        onCangePage={(number) => setCurrentPage(number)}
+        currentPage={currentPage}
+        pageCount={pageCount}
+      />
     </div>
   );
 };
