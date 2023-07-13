@@ -1,1 +1,12 @@
 "start": "set PORT=3006 && react-scripts start"
+
+fetch(url)
+    .then((res) => {
+    return res.json();
+    })
+    .then(({ data, pagecount }) => {
+    currentPage > pagecount && setCurrentPage(1);
+    setItem(data);
+    setpageCount(pagecount);
+    setIsLoading(false);
+    });
