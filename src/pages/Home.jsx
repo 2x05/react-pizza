@@ -4,12 +4,7 @@ import qs from 'qs';
 import { useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 
-import {
-  setCategoryId,
-  setCurrentPage,
-  // setPageCount,
-  setFilters,
-} from '../redux/slices/filterSlice';
+import { setCategoryId, setCurrentPage, setFilters } from '../redux/slices/filterSlice';
 
 import { SearchContext } from '../App';
 
@@ -24,10 +19,8 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { categoryId, sortType, currentPage, pageCount } = useSelector(
-    (state) => state.filterSlice,
-  );
-  const { items, status } = useSelector((state) => state.pizzasSlice);
+  const { categoryId, sortType, currentPage } = useSelector((state) => state.filterSlice);
+  const { items, status, pageCount } = useSelector((state) => state.pizzasSlice);
 
   const { searchValue } = React.useContext(SearchContext);
 
@@ -45,8 +38,6 @@ const Home = () => {
     params.append('pagenumber', currentPage);
     url.search = params.toString();
     dispatch(fetchPizzas({ url }));
-    // currentPage > data.pagecount && dispatch(setCurrentPage(1));
-    // dispatch(setPageCount(data.pagecount));
   };
 
   React.useEffect(() => {
@@ -63,7 +54,8 @@ const Home = () => {
   React.useEffect(() => {
     window.scrollTo(0, 0);
     getPizzas();
-  }, [categoryId, sortType, searchValue, currentPage]);
+    currentPage > pageCount && dispatch(setCurrentPage(1));
+  }, [categoryId, sortType, searchValue, currentPage, pageCount]);
 
   React.useEffect(() => {
     const queryString = qs.stringify({
@@ -74,7 +66,7 @@ const Home = () => {
       pagenumber: currentPage,
     });
     navigate(`?${queryString}`);
-  }, [categoryId, sortType, searchValue, currentPage]);
+  }, [categoryId, sortType, searchValue, currentPage, pageCount]);
 
   const skeleton = [...new Array(12)].map((_, index) => <LoadingBlock key={index} />);
   const pizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />);
@@ -94,11 +86,13 @@ const Home = () => {
       ) : (
         <>
           <div className="content__items">{status === 'loading' ? skeleton : pizzas}</div>
-          <Pagination
-            onCangePage={(number) => dispatch(setCurrentPage(number))}
-            currentPage={currentPage}
-            // pageCount={pageCount}
-          />
+          {pageCount > 0 && (
+            <Pagination
+              onCangePage={(number) => dispatch(setCurrentPage(number))}
+              currentPage={currentPage}
+              pageCount={pageCount}
+            />
+          )}
         </>
       )}
     </div>

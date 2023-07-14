@@ -11,7 +11,7 @@ const Pagination = ({ onCangePage, currentPage, pageCount }) => {
       previousLabel="<"
       onPageChange={(event) => onCangePage(event.selected + 1)}
       pageRangeDisplayed={4}
-      pageCount={pageCount ? pageCount : 3}
+      pageCount={pageCount}
       forcePage={currentPage - 1}
     />
   );
