@@ -1,5 +1,4 @@
 import React from 'react';
-import axios from 'axios';
 import qs from 'qs';
 
 import { useNavigate } from 'react-router-dom';
@@ -8,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import {
   setCategoryId,
   setCurrentPage,
-  setPageCount,
+  // setPageCount,
   setFilters,
 } from '../redux/slices/filterSlice';
 
@@ -19,27 +18,24 @@ import Categories from '../components/Categories/Categories';
 import PizzaBlock from '../components/PizzaBlock/PizzaBlock';
 import LoadingBlock from '../components/PizzaBlock/LoadingBlock';
 import Pagination from '../components/Pagination/Pagination';
+import { fetchPizzas } from '../redux/slices/pizzasSlice';
 
 const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const isSearch = React.useRef(false);
-  const isMounted = React.useRef(false);
 
   const { categoryId, sortType, currentPage, pageCount } = useSelector(
     (state) => state.filterSlice,
   );
+  const { items, status } = useSelector((state) => state.pizzasSlice);
 
   const { searchValue } = React.useContext(SearchContext);
-  const [item, setItem] = React.useState([]);
-  const [isLoadind, setIsLoading] = React.useState(false);
 
   const onCangeCategory = (id) => {
     dispatch(setCategoryId(id));
   };
 
-  const fetchPizzas = () => {
-    setIsLoading(true);
+  const getPizzas = async () => {
     const url = new URL('http://127.0.0.1:5000/api/pizzas');
     const params = new URLSearchParams();
     params.append('category', categoryId);
@@ -48,12 +44,9 @@ const Home = () => {
     params.append('pagesize', 4);
     params.append('pagenumber', currentPage);
     url.search = params.toString();
-    axios.get(url).then((res) => {
-      currentPage > res.data.pagecount && dispatch(setCurrentPage(1));
-      setItem(res.data.data);
-      dispatch(setPageCount(res.data.pagecount));
-      setIsLoading(false);
-    });
+    dispatch(fetchPizzas({ url }));
+    // currentPage > data.pagecount && dispatch(setCurrentPage(1));
+    // dispatch(setPageCount(data.pagecount));
   };
 
   React.useEffect(() => {
@@ -64,34 +57,27 @@ const Home = () => {
           ...params,
         }),
       );
-      isSearch.current = true;
     }
   }, []);
 
   React.useEffect(() => {
     window.scrollTo(0, 0);
-    if (!isSearch.current) {
-      fetchPizzas();
-    }
-    isSearch.current = false;
+    getPizzas();
   }, [categoryId, sortType, searchValue, currentPage]);
 
   React.useEffect(() => {
-    if (isMounted.current) {
-      const queryString = qs.stringify({
-        category: categoryId,
-        sorttype: sortType,
-        search: searchValue,
-        pagesize: 4,
-        pagenumber: currentPage,
-      });
-      navigate(`?${queryString}`);
-    }
-    isMounted.current = true;
+    const queryString = qs.stringify({
+      category: categoryId,
+      sorttype: sortType,
+      search: searchValue,
+      pagesize: 4,
+      pagenumber: currentPage,
+    });
+    navigate(`?${queryString}`);
   }, [categoryId, sortType, searchValue, currentPage]);
 
   const skeleton = [...new Array(12)].map((_, index) => <LoadingBlock key={index} />);
-  const pizzas = item.map((obj) => <PizzaBlock key={obj.id} {...obj} />);
+  const pizzas = items.map((obj) => <PizzaBlock key={obj.id} {...obj} />);
 
   return (
     <div className="container">
@@ -100,13 +86,20 @@ const Home = () => {
         <Sort />
       </div>
       <h2 className="content__title">Все пиццы</h2>
-      <div className="content__items">{isLoadind ? skeleton : pizzas}</div>
-      {pageCount > 0 && (
-        <Pagination
-          onCangePage={(number) => dispatch(setCurrentPage(number))}
-          currentPage={currentPage}
-          pageCount={pageCount}
-        />
+      {status === 'error' ? (
+        <div className="content__error-info">
+          <h2>Произошла ошибка 😕</h2>
+          <p>К сожалению, не удалось получить питсы. Попробуйте повторить попытку позже.</p>
+        </div>
+      ) : (
+        <>
+          <div className="content__items">{status === 'loading' ? skeleton : pizzas}</div>
+          <Pagination
+            onCangePage={(number) => dispatch(setCurrentPage(number))}
+            currentPage={currentPage}
+            // pageCount={pageCount}
+          />
+        </>
       )}
     </div>
   );
