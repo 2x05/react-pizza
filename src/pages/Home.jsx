@@ -6,8 +6,6 @@ import { useSelector, useDispatch } from 'react-redux';
 
 import { setCategoryId, setCurrentPage, setFilters } from '../redux/slices/filterSlice';
 
-import { SearchContext } from '../App';
-
 import Sort from '../components/Sort/Sort';
 import Categories from '../components/Categories/Categories';
 import PizzaBlock from '../components/PizzaBlock/PizzaBlock';
@@ -19,10 +17,10 @@ const Home = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const { categoryId, sortType, currentPage } = useSelector((state) => state.filterSlice);
+  const { categoryId, sortType, currentPage, searchValue } = useSelector(
+    (state) => state.filterSlice,
+  );
   const { items, status, pageCount } = useSelector((state) => state.pizzasSlice);
-
-  const { searchValue } = React.useContext(SearchContext);
 
   const onCangeCategory = (id) => {
     dispatch(setCategoryId(id));
@@ -33,7 +31,7 @@ const Home = () => {
     const params = new URLSearchParams();
     params.append('category', categoryId);
     params.append('sorttype', sortType);
-    params.append('search', searchValue);
+    searchValue && params.append('search', searchValue);
     params.append('pagesize', 4);
     params.append('pagenumber', currentPage);
     url.search = params.toString();
